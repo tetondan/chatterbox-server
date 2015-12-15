@@ -44,7 +44,7 @@ var app = {
       // data: 'text/plain',
       contentType: 'text/plain',
       success: function (data) {
-        app.args = data.results;
+        app.args = JSON.parse(data).results;
       },
       error: function (data) {
         console.error('chatterbox: Failed to retrieve');
@@ -92,6 +92,7 @@ var app = {
   },
   handleSubmit: function(e){
     var message = {};
+    message.objectId = Math.floor(Math.random() * 10000000); 
     message.username = window.location.search.split('=')[1];
     message.text = $("#message").val();
     message.roomname = $("#roomSelect").val();
