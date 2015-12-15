@@ -11,8 +11,12 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-
+var resultsObj = {
+    results: []
+  };
 var requestHandler = function(request, response) {
+
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -30,20 +34,18 @@ var requestHandler = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   // The outgoing status.
-  var statusCode = 200;
 
   // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "text/plain";
+
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -52,7 +54,72 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+  // if (request.url === "/classes/chatterbox") {
+  //   if(request.method === "GET") {
+  //     // do something
+  //     var headers = defaultCorsHeaders;
+  //     var statusCode = 200;
+  //     console.log("Send results!")
+  //     headers['Content-Type'] = "text/plain";
+  //     response.writeHead(statusCode, headers);
+  //     response.write(JSON.stringify(resultsObj));
+  //     response.end();
+  //   }
+  //   if(request.method === "POST"){
+  //     var body = [];
+  //     request.on('data', function(chunk) {
+  //       body.push(chunk);
+  //     }).on('end', function() {
+  //       body = Buffer.concat(body).toString()
+  //       body = JSON.parse(body);
+  //       // at this point, `body` has the entire request body stored in it as a string
+  //       resultsObj.results.push(body)
+  //       response.end();
+
+  //     });
+  //   }
+  // }
+  var pathObj = {'/classes/messages': '/classes/messages', '/classes/room1': '/classes/room1','/classes/room': '/classes/room'}
+  if(pathObj[request.url]){
+    console.log(request.url);
+    if(request.method === 'GET'){
+      var headers = defaultCorsHeaders;
+      var statusCode = 200;
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+      response.write(JSON.stringify(resultsObj));
+      response.end();
+    }
+    if(request.method === "POST"){
+      var body = [];
+      var statusCode = 201;
+      var headers = defaultCorsHeaders;
+      request.on('data', function(chunk) {
+        body.push(chunk);
+      }).on('end', function() {
+        body = Buffer.concat(body).toString()
+        body = JSON.parse(body);
+          // at this point, `body` has the entire request body stored in it as a string
+        resultsObj.results.push(body)
+        headers['Content-Type'] = "text/plain";
+        response.writeHead(statusCode, headers);
+        response.end();
+      });
+    }
+    if(request.method === 'OPTIONS'){
+      var headers = defaultCorsHeaders;
+      var statusCode = 200;
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+      response.end();
+    }
+  } else {
+    var headers = defaultCorsHeaders;
+    var statusCode = 404;
+    headers['Content-Type'] = "text/plain";
+    response.writeHead(statusCode, headers);
+    response.end();
+  }
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -70,4 +137,6 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
+exports.requestHandler = requestHandler
 
