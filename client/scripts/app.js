@@ -1,5 +1,14 @@
 // YOUR CODE HERE:
 //https://api.parse.com/1/classes/chatterbox
+if (!/(&|\?)username=/.test(window.location.search)) {
+  var newSearch = window.location.search;
+  if (newSearch !== '' & newSearch !== '?') {
+    newSearch += '&';
+  }
+  newSearch += 'username=' + (prompt('What is your name?') || 'anonymous');
+  window.location.search = newSearch;
+}
+
 var app = {
   init: function(){
     $("#roomadd").submit(function(e){
@@ -45,6 +54,7 @@ var app = {
       contentType: 'text/plain',
       success: function (data) {
         app.args = JSON.parse(data).results;
+        //console.log(app.args)
       },
       error: function (data) {
         console.error('chatterbox: Failed to retrieve');
