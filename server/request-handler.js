@@ -11,13 +11,13 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var resultsObj = {
-    results: []
-  };
-var requestHandler = function(request, response) {
+  var resultsObj = {
+      results: []
+    };
+module.exports = function(request, response) {
 
   console.log("Serving request type " + request.method + " for url " + request.url);
-  var pathObj = {'/classes/messages': '/classes/messages', '/classes/room1': '/classes/room1','/classes/room': '/classes/room'}
+  var pathObj = {'/classes/messages': '/classes/messages', '/classes/room1': '/classes/room1','/classes/room': '/classes/room'};
   if(pathObj[request.url]){
     console.log(request.url);
     if(request.method === 'GET'){
@@ -29,16 +29,14 @@ var requestHandler = function(request, response) {
       response.end();
     }
     if(request.method === "POST"){
-      var body = [];
+      var body = '';
       var statusCode = 201;
       var headers = defaultCorsHeaders;
       request.on('data', function(chunk) {
-        body.push(chunk);
+        body += chunk;
       }).on('end', function() {
-        body = Buffer.concat(body).toString()
-        body = JSON.parse(body);
           // at this point, `body` has the entire request body stored in it as a string
-        resultsObj.results.push(body)
+        resultsObj.results.push(JSON.parse(body));
         headers['Content-Type'] = "text/plain";
         response.writeHead(statusCode, headers);
         response.end();
@@ -67,7 +65,7 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
-exports.requestHandler = requestHandler
+// exports.requestHandler = requestHandler;
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as

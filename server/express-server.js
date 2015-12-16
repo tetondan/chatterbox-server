@@ -11,10 +11,12 @@ var defaultCorsHeaders = {
 };
 
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 var app = express();
 
 app.use(bodyParser.text());
+
+app.use('/', express.static('../client'));
 
 app.route('/classes/messages')
   .get(function(req, res){
@@ -25,13 +27,12 @@ app.route('/classes/messages')
   .post(function(req, res){
     resultsObj.results.push(JSON.parse(req.body));
     res.set(defaultCorsHeaders);
-    console.log(resultsObj);
     res.status(201).end();
   })
   .options(function(req, res){
     res.set(defaultCorsHeaders);
     res.end();
-  })
+  });
 
 var server = app.listen(3000, function(){
   var host = server.address().address;
